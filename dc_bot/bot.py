@@ -1,50 +1,32 @@
 
-import discord
+import os, discord, datetime, requests
 
-bot = {
-    "token": "ODY0ODIzMDI2MDE3MTA4MDA1.YO7DNQ.PwRuW7sCk2BOIQzR6UyVJEmg6Cc"
-}
+intents = discord.Intents.default()
+intents.members = True
+client = discord.Client(intents=intents)
 
-# intents = discord.Intents.default()
-# intents.members = True
-# client = discord.Client(intents=intents)
+def time():
+    date = datetime.datetime.now()
+    return f"{date.year}/{date.month}/{date.day}~{date.strftime('%X')}"
 
-# @client.event
-# async def on_ready():
-#     print('{0.user}:({0.user.id}) logged in'.format(client))
+@client.event
+async def on_ready():
+    print('@ {1}\n{0.user}:({0.user.id}) logged in\n'.format(client, time()))
 
-# @client.event
-# async def on_message(message):
-#     if message.author == client.user:
-#         return
+@client.event
+async def on_message(message):
+    if message.author==client.user:
+        return
     
-#     print("From {0.author}:({0.author.id})\nMessage: {0.content}".format(message))
+    print("@ {1}\nFrom {0.author}:({0.author.id})\nMessage: {0.content}\n".format(message, time()))
 
-# @client.event
-# async def on_member_join(member):
+@client.event
+async def on_member_join(member):
+    print("@ {1}\nUser: {0}:({0.id})\nJoined: {0.guild}:({0.guild.id})\n".format(member, time()))
 
-#     print(f"{member}:({member.id}) has joined")
-
-# if __name__=="__main__":
-#     client.run(bot["token"])
-
-class Client(discord.Client):
-    async def on_ready(self):
-        print('{0.user}:({0.user.id}) logged in\n'.format(self))
-    
-    async def on_message(self, message):
-        if message.author == self.user:
-            return
-        
-        print("From {0.author}:({0.author.id})\nMessage: {0.content}\n".format(message))
-
-    async def on_member_join(self, member):
-
-        print(f"{member}:({member.id}) has joined\n")
+@client.event
+async def on_member_remove(member):
+    print("@ {1}\nUser: {0}:({0.id})\nLeft: {0.guild}:({0.guild.id})\n".format(member, time()))
 
 if __name__=="__main__":
-    intents = discord.Intents.default()
-    intents.members = True
-
-    client = Client(intents=intents)
-    client.run(bot["token"])
+    client.run(os.getenv("BOT_TOKEN"))
