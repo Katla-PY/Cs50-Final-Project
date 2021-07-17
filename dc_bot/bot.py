@@ -21,23 +21,20 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author==client.user:
         return
 
     await client.process_commands(message)
 
-    print("@ {1}\nFrom {0.author}:({0.author.id})\nMessage: {0.content}\n".format(
-        message, time()))
+    print("@ {1}\nFrom {0.author}:({0.author.id})\nMessage: {0.content}\n".format(message, time()))
 
 @client.event
 async def on_member_join(member):
-    print("@ {1}\nUser: {0}:({0.id})\nJoined: {0.guild}:({0.guild.id})\n".format(
-        member, time()))
+    print("@ {1}\nUser: {0}:({0.id})\nJoined: {0.guild}:({0.guild.id})\n".format(member, time()))
 
 @client.event
 async def on_member_remove(member):
-    print("@ {1}\nUser: {0}:({0.id})\nLeft: {0.guild}:({0.guild.id})\n".format(
-        member, time()))
+    print("@ {1}\nUser: {0}:({0.id})\nLeft: {0.guild}:({0.guild.id})\n".format(member, time()))
 
 ###
 # Bot commands
@@ -45,11 +42,15 @@ async def on_member_remove(member):
 
 @client.command(name="setup")
 async def _setup(ctx):
-    await ctx.send("go fuck yourself you do it")
+    
+    await ctx.send("Setting up {0.name}:({0.id})".format(ctx.guild))
+    
+    # await ctx.send("{0.name}:({0.id})\nmembers:\n{1}".format(ctx.guild, "\n".join(i.name for i in ctx.guild.members)))
+    await ctx.send("Setup complete(not really)")
 
 @client.command(name="p")
-async def _print(ctx, string):
-    await ctx.send(string)
+async def _print(ctx, *, message):
+    await ctx.send(message)
 
 if __name__=='__main__':
-    client.run(os.getenv("BOT"))
+    client.run(os.getenv("BOT_TOKEN"))
