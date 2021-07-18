@@ -27,20 +27,46 @@ def setup():
         return (jsonify({"exists": False}), 200)
     return (jsonify({"exists": True}), 200)
 
-@app.route("/server_setup_users")
-def setup_users():
+@app.route("/add_user")
+def add_user():
     user_id = request.args["user-id"]
-    server_id = request.args["server-id"]
-    
-    if not user_id: return None
-    if not server_id: return None
+    user_name = request.args["user-name"]
+
+    # checks that data is not None
+    if not user_id: return ("", 500)
+    if not user_name: return ("", 500)
 
     con = sqlite3.connect("./cs50-fp.db")
     cur = con.cursor()
+    
+    if not cur.execute(f"SELECT user_id FROM users WHERE user_id={user_id}").fetchone():
+        cur.execute(f"INSERT INTO users(user_id, user_name) VALUES({user_id}, {user_name})")
+        con.commit()
 
-    cur.execute(f"INSERT INTO users(user_id, server_id) VALUES({user_id}, {server_id})")
+    return ("", 200)
+
+@app.route("/add_user_server")
+def add_user_server():
+    user_id = request.args["user-id"]
+    server_id = request.args["server-id"]
+    
+    if not user_id: return ("", 500)
+    if not server_id: return ("", 500)
+    
+    con = sqlite3.connect("./cs50-fp.db")
+    cur = con.cursor()
+
+    cur.execute(f"INSERT INTO user_servers(user_id, server_id) VALUES({user_id}, {server_id})")
     con.commit()
 
     return ("", 200)
+
+@app.route("/kick_user")
+def kick_user():
+    pass
+
+@app.route("/ban_user")
+def ban_user():
+    pass
 
 app.run()

@@ -31,6 +31,7 @@ async def on_message(message):
 
 @client.event
 async def on_member_join(member):
+    
     print("@ {1}\nUser: {0}:({0.id})\nJoined: {0.guild}:({0.guild.id})\n".format(member, time()))
 
 @client.event
@@ -58,7 +59,8 @@ async def _setup(ctx):
         return
 
     for member in ctx.guild.members:
-        api_req = requests.get(f"http://127.0.0.1:5000/server_setup_users?server-id={ctx.guild.id}&user-id={member.id}")
+        requests.get(f"http://127.0.0.1:5000/add_user?user-id={member.id}&user-name={member.name}")
+        requests.get(f"http://127.0.0.1:5000/add_user_server?user-id={member.id}&server-id={ctx.guild.id}")
 
     await ctx.send("Server setup complete")
 
