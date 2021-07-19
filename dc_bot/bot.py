@@ -49,7 +49,7 @@ async def _setup(ctx):
     await ctx.send("Setting up {0.name}:({0.id})".format(ctx.guild))
 
     # gets bool from flask api
-    api_req = requests.get("http://127.0.0.1:5000/server_setup?server-id={0.id}&server-name={0.name}".format(ctx.guild))
+    api_req = requests.get("http://127.0.0.1:5000/api/server_setup?server-id={0.id}&server-name={0.name}".format(ctx.guild))
 
     # loads api response as dict
     api_req = json.loads(api_req.text)
@@ -59,8 +59,8 @@ async def _setup(ctx):
         return
 
     for member in ctx.guild.members:
-        requests.get(f"http://127.0.0.1:5000/add_user?user-id={member.id}&user-name={member.name}")
-        requests.get(f"http://127.0.0.1:5000/add_user_server?user-id={member.id}&server-id={ctx.guild.id}")
+        requests.get(f"http://127.0.0.1:5000/api/add_user?user-id={member.id}&user-name={member.name}")
+        requests.get(f"http://127.0.0.1:5000/api/add_user_server?user-id={member.id}&server-id={ctx.guild.id}")
 
     await ctx.send("Server setup complete")
 
