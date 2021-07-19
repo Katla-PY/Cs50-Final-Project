@@ -10,8 +10,8 @@ def index():
     return render_template("api.html")
 
 
-@app.route("/api/server_setup")
-def setup():
+@app.route("/api/add_server")
+def add_server():
     server_id = request.args["server-id"]
     server_name = request.args["server-name"]
     
@@ -28,6 +28,25 @@ def setup():
         con.close()
         return (jsonify({"exists": False}), 200)
     return (jsonify({"exists": True}), 200)
+
+
+@app.route("/api/remove_server")
+def remove_server():
+    server_id = request.args["server-id"]
+    
+    if not server_id: return ("", 500)
+    
+    con = sqlite3.connect("./cs50-fp.db")
+    cur = con.cursor()
+    
+    cur.execute(f"DELETE FROM user_servers WHERE server_id={server_id}")
+    cur.execute(f"DELETE FROM user_violations WHERE server_id={server_id}")
+    cur.execute(f"DELETE FROM servers WHERE server_id={server_id}")
+    
+    con.commit()
+    con.close()
+    
+    return ("", 200)
 
 
 @app.route("/api/add_user")
@@ -88,4 +107,5 @@ def user_violation():
     con.close()
 
     return ("", 200)
+
 app.run()
