@@ -42,6 +42,7 @@ async def on_member_remove(member):
 # Bot commands
 ###
 
+# TODO: create roll muted on setup
 @client.command(name="setup")
 @commands.has_permissions(administrator=True)
 async def _setup(ctx):
@@ -64,12 +65,38 @@ async def _setup(ctx):
 
     await ctx.send("Server setup complete")
 
+@client.command(name="mute")
+async def _mute(ctx, user: discord.Member, *, reason=None):
+
+    requests.get(f"http://127.0.0.1:5000/api/user_violation?user-id={user.id}&server-id={ctx.guild.id}&violation-id=2&reason={reason}")
+
+    role = discord.utils.get(ctx.guild.roles, name="muted")
+
+    if not role:
+        role = await ctx.guild.create_role(name="muted")
+
+        for channel in ctx.guild.channels:
+            await channel.set_permissions(role, send_messages=False, speak=False, read_message_history=True)
+
+    # embed = discord.Embed(title="muted", description=f"{member.mention} was muted ", colour=discord.Colour.light_gray())
+    # embed.add_field(name="reason:", value=reason, inline=False)
+    # await ctx.send(embed=embed)
+    await user.add_roles(role, reason=reason)
+    # await user.send(f" you have been muted from: {guild.name} reason: {reason}")
+
 @client.command(name="sheesh")
 async def _sheesh(ctx):
     await ctx.send("https://cdn.discordapp.com/attachments/680928395399266314/865187562918117396/sheeesh.mp4")
 
+@client.command("whoasked")
+async def _whoasked(ctx, user):
+    await ctx.message.delete()
+    await ctx.send(f"{user} https://cdn.discordapp.com/attachments/680928395399266314/866657138280890438/video0_3.mp4")
+
+
 @client.command(name="p")
 async def _print(ctx, *, message):
+    await ctx.message.delete()
     await ctx.send(message)
 
 if __name__=='__main__':

@@ -36,12 +36,8 @@ def add_user():
     user_name = request.args["user-name"]
 
     # checks that data is not None
-    if not user_id: 
-        print("no user-id")
-        return ("", 500)
-    if not user_name:
-        print("no user-name")
-        return ("", 500)
+    if not user_id: return ("", 500)
+    if not user_name: return ("", 500)
 
     con = sqlite3.connect("./cs50-fp.db")
     cur = con.cursor()
@@ -62,7 +58,7 @@ def add_user_server():
     if not user_id: return ("", 500)
     if not server_id: return ("", 500)
     
-    con = sqlite3.connect("./flask_app/cs50-fp.db")
+    con = sqlite3.connect("./cs50-fp.db")
     cur = con.cursor()
 
     cur.execute(f"INSERT INTO user_servers(user_id, server_id) VALUES({user_id}, {server_id})")
@@ -71,12 +67,25 @@ def add_user_server():
 
     return ("", 200)
 
-@app.route("/api/kick_user")
-def kick_user():
-    pass
 
-@app.route("/api/ban_user")
-def ban_user():
-    pass
+@app.route("/api/user_violation")
+def user_violation():
+    user_id = request.args["user-id"]
+    server_id = request.args["server-id"]
+    violation_id = request.args["violation-id"]
+    reason = request.args["reason"]
 
+    if not user_id: return ("", 500)
+    if not server_id: return ("", 500)
+    if not violation_id: return ("", 500)
+    if not reason: return ("", 500)
+
+    con = sqlite3.connect("./cs50-fp.db")
+    cur = con.cursor()
+
+    cur.execute(f"INSERT INTO user_violations(user_id, server_id, violation_id, reason) VALUES({user_id}, {server_id}, {violation_id}, '{reason}')")
+    con.commit()
+    con.close()
+
+    return ("", 200)
 app.run()
