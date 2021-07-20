@@ -10,10 +10,10 @@ def index():
     return render_template("api.html")
 
 
-@app.route("/api/add_server")
+@app.route("/api/add_server", methods=["POST"])
 def add_server():
-    server_id = request.args["server-id"]
-    server_name = request.args["server-name"]
+    server_id = request.form["server-id"]
+    server_name = request.form["server-name"]
     
     if not server_id: return None
     if not server_name: return None
@@ -30,9 +30,9 @@ def add_server():
     return (jsonify({"exists": True}), 200)
 
 
-@app.route("/api/remove_server")
+@app.route("/api/remove_server", methods=["POST"])
 def remove_server():
-    server_id = request.args["server-id"]
+    server_id = request.form["server-id"]
     
     if not server_id: return ("", 500)
     
@@ -49,10 +49,12 @@ def remove_server():
     return ("", 200)
 
 
-@app.route("/api/add_user")
+@app.route("/api/add_user", methods=["POST"])
 def add_user():
-    user_id = request.args["user-id"]
-    user_name = request.args["user-name"]
+    # user_id = request.args["user-id"]
+    # user_name = request.args["user-name"]
+    user_id = request.form["user-id"]
+    user_name = request.form["user-name"]
 
     # checks that data is not None
     if not user_id: return ("", 500)
@@ -69,10 +71,10 @@ def add_user():
     return ("", 200)
 
 
-@app.route("/api/add_user_server")
+@app.route("/api/add_user_server", methods=["POST"])
 def add_user_server():
-    user_id = request.args["user-id"]
-    server_id = request.args["server-id"]
+    user_id = request.form["user-id"]
+    server_id = request.form["server-id"]
     
     if not user_id: return ("", 500)
     if not server_id: return ("", 500)

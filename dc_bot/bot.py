@@ -44,7 +44,7 @@ async def on_member_remove(member):
 
 @client.event
 async def on_guild_remove(guild):
-    requests.get(f"{API_URL}/api/remove_server?server-id={guild.id}")
+    requests.request("POST", f"{API_URL}/api/remove_server", data={"server-id": guild.id})
 
 ###
 # Bot commands
@@ -58,7 +58,7 @@ async def _setup(ctx):
     await ctx.send("Setting up {0.name}:({0.id})".format(ctx.guild))
 
     # gets bool from flask api
-    api_req = requests.get("{1}/api/add_server?server-id={0.id}&server-name={0.name}".format(ctx.guild, API_URL))
+    api_req = requests.post(f"{API_URL}/api/add_server", data={"server-id": ctx.guild.id, "server-name": ctx.guild.name})
 
     # loads api response as dict
     api_req = json.loads(api_req.text)
@@ -68,8 +68,8 @@ async def _setup(ctx):
         return
 
     for member in ctx.guild.members:
-        requests.get(f"{API_URL}/api/add_user?user-id={member.id}&user-name={member.name}")
-        requests.get(f"{API_URL}/api/add_user_server?user-id={member.id}&server-id={ctx.guild.id}")
+        requests.post(f"{API_URL}/api/add_user", data={"user-id": member.id, "user-name": member.name})
+        requests.post(f"{API_URL}/api/add_user_server", data={"user-id": member.id, "server-id": ctx.guild.id})
 
     await ctx.send("Server setup complete")
 
@@ -98,8 +98,6 @@ async def _unmute(ctx, user: discord.Member):
     await user.remove_roles(role)
 
 
-@client.command
-
 @client.command(name="sheesh")
 async def _sheesh(ctx):
     await ctx.send("https://cdn.discordapp.com/attachments/680928395399266314/865187562918117396/sheeesh.mp4")
@@ -114,6 +112,15 @@ async def _whoasked(ctx, user):
 async def _print(ctx, *, message):
     await ctx.message.delete()
     await ctx.send(message)
+
+
+@client.command(name="post-test")
+async def _post(ctx):
+    data = {
+        "user-id": 69,
+        "user-name": "ksdfj"
+    }
+    requests.post(f"{API_URL}/api/add_user", data=data)
 
 if __name__=='__main__':
     client.run(os.getenv("BOT_TOKEN"))
