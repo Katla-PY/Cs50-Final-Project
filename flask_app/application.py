@@ -48,38 +48,41 @@ def remove_server():
     return "", 200
 
 
-@app.route("/api/add_user", methods=["POST"])
-def add_user():
-    user_id = request.form["user-id"]
-    user_name = request.form["user-name"]
+@app.route("/api/add_server_users", methods=["POST"])
+def add_server_users():
+    users = request.json["users"]
 
     # checks that data is not None
-    if not user_id: return "", 500
-    if not user_name: return "", 500
+    if not users: return "", 500
 
     con = sqlite3.connect("./cs50-fp.db")
     cur = con.cursor()
-
-    if not cur.execute(f"SELECT user_id FROM users WHERE user_id={user_id}").fetchone():
-        cur.execute(f"INSERT INTO users(user_id, user_name) VALUES({user_id}, '{user_name}')")
-        con.commit()
-        con.close()
+    
+    for user in users:
+        if not cur.execute(f"SELECT user_id FROM users WHERE user_id={user[0]}").fetchone():
+            cur.execute(f"INSERT INTO users(user_id, user_name) VALUES({user[0]}, '{user[1]}')")
+    
+    con.commit()
+    con.close()
 
     return "", 200
 
 
 @app.route("/api/add_user_server", methods=["POST"])
 def add_user_server():
-    user_id = request.form["user-id"]
-    server_id = request.form["server-id"]
+    data = request.json
 
-    if not user_id: return "", 500
-    if not server_id: return "", 500
+    if not data: return "", 500
+
+    server_id = data["server-id"]
+    users = data["users"]
 
     con = sqlite3.connect("./cs50-fp.db")
     cur = con.cursor()
 
-    cur.execute(f"INSERT INTO user_servers(user_id, server_id) VALUES({user_id}, {server_id})")
+    for user in users:
+        cur.execute(f"INSERT INTO user_servers(user_id, server_id) VALUES({user[0]}, {server_id})")
+
     con.commit()
     con.close()
 
@@ -114,4 +117,6 @@ def user_violation():
 
     return jsonify({"warns": warn_count[0]}), 200
 
-app.run()
+
+if __name__=="__main__":
+    app.run()

@@ -75,15 +75,21 @@ async def _setup(ctx):
         await ctx.send("Server already setup")
         return
 
+    members = []
+
     for member in ctx.guild.members:
-        requests.request(
-            "POST", f"{API_URL}/api/add_user",
-            data={"user-id": member.id, "user-name": member.name}
-        )
-        requests.request(
-            "POST", f"{API_URL}/api/add_user_server",
-            data={"user-id": member.id, "server-id": ctx.guild.id}
-        )
+        members.append([member.id, member.name])
+
+    requests.request(
+        "POST", f"{API_URL}/api/add_server_users",
+        json={"users": members}
+    )
+
+    # TODO: implement json send with add_user_server
+    requests.request(
+        "POST", f"{API_URL}/api/add_user_server",
+        json={"server-id": ctx.guild.id, "users": members}
+    )
 
     await ctx.send("Server setup complete")
 
