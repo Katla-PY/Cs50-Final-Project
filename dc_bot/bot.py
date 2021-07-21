@@ -117,7 +117,12 @@ async def _mute(ctx, user: discord.Member, minutes: int=5, *, reason="No reason 
 
 
 @client.command(name="kick")
-async def _kick(ctx, user, *, reason="No reason provided"):
+async def _kick(ctx, user: discord.Member, *, reason="No reason provided"):
+    requests.request(
+        "POST", f"{API_URL}/api/user_violation",
+        data={"user-id": user.id, "server-id": ctx.guild.id, "violation-id": 3, "reason": reason}
+    )
+
     await user.kick(reason=reason)
 
     embed = discord.Embed(title="User::Kick", color=0xff0000)
@@ -128,6 +133,11 @@ async def _kick(ctx, user, *, reason="No reason provided"):
 
 @client.command(name="ban")
 async def _ban(ctx, user: discord.Member, *, reason="No reason provided"):
+    requests.request(
+        "POST", f"{API_URL}/api/user_violation",
+        data={"user-id": user.id, "server-id": ctx.guild.id, "violation-id": 4, "reason": reason}
+    )
+
     await user.ban(reason=reason)
 
     embed = discord.Embed(title="User::Ban", color=0xff0000)
@@ -182,5 +192,5 @@ async def _print(ctx, *, message):
     await ctx.send(message)
 
 
-if __name__ == "__main__":
+if __name__=="__main__":
     client.run(os.getenv("BOT_TOKEN"))
