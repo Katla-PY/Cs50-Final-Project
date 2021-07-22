@@ -94,7 +94,7 @@ async def _setup(ctx):
 
 
 @client.command(name="mute")
-async def _mute(ctx, user: discord.Member, minutes: int=5, *, reason="No reason provided"):
+async def _mute(ctx, user: discord.Member, time_: int=5, unit="m", *, reason="No reason provided"):
     try:
         await ctx.message.delete()
     except discord.errors.NotFound:
@@ -117,15 +117,24 @@ async def _mute(ctx, user: discord.Member, minutes: int=5, *, reason="No reason 
 
     log_channel = discord.utils.get(ctx.guild.channels, name="logs").id
     log_channel = client.get_channel(log_channel)
-    await log_channel.send(f"{ctx.message.author.name} muted {user.name}")
+    await log_channel.send(f"{ctx.message.author} **muted** {user}")
 
     embed = discord.Embed(title="User::Mute", color=0xff0000)
     embed.add_field(name="User:", value=f"{user.name}", inline=False)
-    embed.add_field(name="Minutes:", value=f"{minutes}", inline=False)
+    embed.add_field(name="Unit:", value=f"{time_} {unit}", inline=False)
     embed.add_field(name="Reason:", value=f"{reason}", inline=False)
     await ctx.send(embed=embed)
 
-    seconds = minutes*60
+    if unit not in ["s", "m", "h"]:
+        unit = "m"
+
+    if unit=="s":
+        seconds = time_
+    elif unit=="m":
+        seconds = time_*60
+    elif unit=="h":
+        seconds = time_*3600
+
     await asyncio.sleep(seconds)
     await user.remove_roles(role)
 
@@ -146,7 +155,7 @@ async def _kick(ctx, user: discord.Member, *, reason="No reason provided"):
 
     log_channel = discord.utils.get(ctx.guild.channels, name="logs").id
     log_channel = client.get_channel(log_channel)
-    await log_channel.send(f"{ctx.message.author.name} kicked {user.name}")
+    await log_channel.send(f"{ctx.message.author} **kicked** {user}")
 
     embed = discord.Embed(title="User::Kick", color=0xff0000)
     embed.add_field(name="User:", value=f"{user.name}", inline=False)
@@ -170,7 +179,7 @@ async def _ban(ctx, user: discord.Member, *, reason="No reason provided"):
 
     log_channel = discord.utils.get(ctx.guild.channels, name="logs").id
     log_channel = client.get_channel(log_channel)
-    await log_channel.send(f"{ctx.message.author} banned {user.name}")
+    await log_channel.send(f"{ctx.message.author} **banned** {user}")
 
     embed = discord.Embed(title="User::Ban", color=0xff0000)
     embed.add_field(name="User:", value=f"{user.name}", inline=False)
@@ -191,9 +200,7 @@ async def _warn(ctx, user: discord.Member, *, reason="No reason provided"):
     api_res = json.loads(api_res.text)
 
     if api_res["warns"] > 0:
-        if api_res["warns"] < 3:
-            return
-        elif api_res["warns"] in (3, 6, 8):
+        if api_res["warns"] in (3, 6, 8):
             await _mute(ctx, user, reason=f"{api_res['warns']} warns")
             return
         elif api_res["warns"] in (5, 7, 9):
@@ -205,7 +212,7 @@ async def _warn(ctx, user: discord.Member, *, reason="No reason provided"):
     
     log_channel = discord.utils.get(ctx.guild.channels, name="logs").id
     log_channel = client.get_channel(log_channel)
-    await log_channel.send(f"{ctx.message.author} warned {user.name}")
+    await log_channel.send(f"{ctx.message.author} **warned** {user}")
 
     embed = discord.Embed(title="User::Warn", color=0xff0000)
     embed.add_field(name="User:", value=f"{user.name}", inline=False)

@@ -32,3 +32,8 @@ CREATE TABLE "user_violations" (
     FOREIGN KEY("violation_id") REFERENCES "violations"("violation_id"),
     FOREIGN KEY("server_id") REFERENCES "servers"("server_id")
 );
+
+INSERT INTO "violations"("violation_desc") VALUES ("warn");
+INSERT INTO "violations"("violation_desc") VALUES ("mute");
+INSERT INTO "violations"("violation_desc") VALUES ("kick");
+INSERT INTO "violations"("violation_desc") VALUES ("ban");

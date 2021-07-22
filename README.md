@@ -1,5 +1,5 @@
 # Cs50-Final-Project
-#### Video Demo:  https://youtube.com
+#### Video Demo:  https://www.youtube.com/watch?v=zcETs6LxURQ
 #### Description:
 For my final project, I decided to make a moderation bot on discord that uses a flask API
 to store data on a database with a "many to many relationship" I chose to do it like this,
