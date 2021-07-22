@@ -1,8 +1,14 @@
 
 import sqlite3
 from flask import Flask, render_template, request, jsonify
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+PATH_TO_DB = "./cs50-test.db"
 
 app = Flask(__name__)
+
+limiter = Limiter(app, key_func=get_remote_address)
 
 @app.route("/api")
 def index():
@@ -10,6 +16,7 @@ def index():
 
 
 @app.route("/api/add_server", methods=["POST"])
+@limiter.limit("5/second")
 def add_server():
     server_id = request.form["server-id"]
     server_name = request.form["server-name"]
@@ -17,7 +24,7 @@ def add_server():
     if not server_id: return None
     if not server_name: return None
 
-    con = sqlite3.connect("./cs50-fp.db")
+    con = sqlite3.connect(PATH_TO_DB)
     cur = con.cursor()
 
     # checks if server already exists in database and if not it adds it
@@ -30,12 +37,13 @@ def add_server():
 
 
 @app.route("/api/remove_server", methods=["POST"])
+@limiter.limit("5/second")
 def remove_server():
     server_id = request.form["server-id"]
     
     if not server_id: return "", 500
     
-    con = sqlite3.connect("./cs50-fp.db")
+    con = sqlite3.connect(PATH_TO_DB)
     cur = con.cursor()
     
     cur.execute(f"DELETE FROM user_servers WHERE server_id={server_id}")
@@ -49,13 +57,14 @@ def remove_server():
 
 
 @app.route("/api/add_server_users", methods=["POST"])
+@limiter.limit("5/second")
 def add_server_users():
     users = request.json["users"]
 
     # checks that data is not None
     if not users: return "", 500
 
-    con = sqlite3.connect("./cs50-fp.db")
+    con = sqlite3.connect(PATH_TO_DB)
     cur = con.cursor()
     
     for user in users:
@@ -69,6 +78,7 @@ def add_server_users():
 
 
 @app.route("/api/add_user_server", methods=["POST"])
+@limiter.limit("5/second")
 def add_user_server():
     data = request.json
 
@@ -77,7 +87,7 @@ def add_user_server():
     server_id = data["server-id"]
     users = data["users"]
 
-    con = sqlite3.connect("./cs50-fp.db")
+    con = sqlite3.connect(PATH_TO_DB)
     cur = con.cursor()
 
     for user in users:
@@ -90,6 +100,7 @@ def add_user_server():
 
 
 @app.route("/api/user_violation", methods=["POST"])
+@limiter.limit("5/second")
 def user_violation():
     user_id = request.form["user-id"]
     server_id = request.form["server-id"]
@@ -101,7 +112,7 @@ def user_violation():
     if not violation_id: return "", 500
     if not reason: return "", 500
 
-    con = sqlite3.connect("./cs50-fp.db")
+    con = sqlite3.connect(PATH_TO_DB)
     cur = con.cursor()
 
     cur.execute(
@@ -118,5 +129,24 @@ def user_violation():
     return jsonify({"warns": warn_count[0]}), 200
 
 
+def db_setup(ptdb: str, schema: str):
+    con = sqlite3.connect(ptdb)
+    cur = con.cursor()
+    cur.executescript(schema)
+    con.commit()
+    con.close()
+
+
 if __name__=="__main__":
+    
+    try:
+        open(PATH_TO_DB, "r").close()
+    except FileNotFoundError:
+        open(PATH_TO_DB, "w").close()
+        
+        with open("./schema.sql", "r") as f:
+            schema = f.read()
+        
+        db_setup(PATH_TO_DB, schema)
+    
     app.run()

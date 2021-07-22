@@ -96,6 +96,8 @@ async def _setup(ctx):
 
 @client.command(name="mute")
 async def _mute(ctx, user: discord.Member, minutes: int=5, *, reason="No reason provided"):
+    await ctx.message.delete()
+    
     requests.request(
         "POST", f"{API_URL}/api/user_violation",
         data={"user-id": user.id, "server-id": ctx.guild.id, "violation-id": 2, "reason": reason}
@@ -124,6 +126,8 @@ async def _mute(ctx, user: discord.Member, minutes: int=5, *, reason="No reason 
 
 @client.command(name="kick")
 async def _kick(ctx, user: discord.Member, *, reason="No reason provided"):
+    await ctx.message.delete()
+    
     requests.request(
         "POST", f"{API_URL}/api/user_violation",
         data={"user-id": user.id, "server-id": ctx.guild.id, "violation-id": 3, "reason": reason}
@@ -139,6 +143,8 @@ async def _kick(ctx, user: discord.Member, *, reason="No reason provided"):
 
 @client.command(name="ban")
 async def _ban(ctx, user: discord.Member, *, reason="No reason provided"):
+    await ctx.message.delete()
+    
     requests.request(
         "POST", f"{API_URL}/api/user_violation",
         data={"user-id": user.id, "server-id": ctx.guild.id, "violation-id": 4, "reason": reason}
@@ -154,6 +160,8 @@ async def _ban(ctx, user: discord.Member, *, reason="No reason provided"):
 
 @client.command(name="warn")
 async def _warn(ctx, user: discord.Member, *, reason="No reason provided"):
+    await ctx.message.delete()
+    
     api_res = requests.request(
         "POST", f"{API_URL}/api/user_violation",
         data={"user-id": user.id, "server-id": ctx.guild.id, "violation-id": 1, "reason": reason}
@@ -199,4 +207,5 @@ async def _print(ctx, *, message):
 
 
 if __name__=="__main__":
-    client.run(os.getenv("BOT_TOKEN"))
+    # client.run(os.getenv("BOT_TOKEN"))
+    client.run("ODY0ODIzMDI2MDE3MTA4MDA1.YO7DNQ.FfEF_LlqOK20XCg4-n94T_MifE8")
