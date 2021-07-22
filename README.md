@@ -66,3 +66,11 @@ combining users and violations
 - adjusting rate limiter for API
 - adding auto moderation check for swear words
 - log the time of every warn, mute etc
+
+#### main dependencies:
+- discord
+- flask
+- flask-limiter
+- requests
+- asyncio
+- sqlite3
